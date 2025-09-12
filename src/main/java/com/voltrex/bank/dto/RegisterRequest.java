@@ -43,8 +43,7 @@ public class RegisterRequest {
     @NotBlank
     private String pincode;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @NotNull(message = "Gender is required")
     private Gender gender;
 
     @NotNull

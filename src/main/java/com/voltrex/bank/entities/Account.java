@@ -1,18 +1,7 @@
 package com.voltrex.bank.entities;
 
 import com.voltrex.bank.entities.AccountType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -70,8 +59,13 @@ public class Account {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @OneToMany(mappedBy = "account")
-    private List<Transaction> transactions = new ArrayList<>();
+    // Transactions where this account is the sender
+    @OneToMany(mappedBy = "fromAccount", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Transaction> outgoingTransactions = new ArrayList<>();
+
+    // Transactions where this account is the receiver
+    @OneToMany(mappedBy = "toAccount", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Transaction> incomingTransactions = new ArrayList<>();
 
     /**
      * Convenience helper to get opening charge from the enum (non-persistent).

@@ -55,8 +55,12 @@ public class Transaction {
      * Which account this transaction belongs to
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false)
-    private Account account;
+    @JoinColumn(name = "from_account_id")
+    private Account fromAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_account_id")
+    private Account toAccount;
 
     private String description;
 
