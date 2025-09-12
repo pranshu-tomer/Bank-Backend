@@ -32,6 +32,7 @@ public class AuthService {
                 .gender(request.getGender())
                 .build();
 
+        user.setStatus(Status.PENDING);
         return userRepository.save(user);
     }
 }

@@ -83,11 +83,11 @@ public class User implements UserDetails {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    private boolean twoFactorEnabled = false;
+    private boolean twoFactorEnabled;
 
-    private boolean loginAlert = false;
+    private boolean loginAlert;
 
-    private Status status = Status.PENDING;
+    private Status status;
 
     /**
      * User -> Accounts: one user may have multiple accounts (business limit to be enforced in services).

@@ -1,6 +1,7 @@
 package com.voltrex.bank.controllers;
 
 import com.voltrex.bank.dto.RegisterRequest;
+import com.voltrex.bank.entities.Status;
 import com.voltrex.bank.entities.User;
 import com.voltrex.bank.services.AuthService;
 import jakarta.validation.Valid;
