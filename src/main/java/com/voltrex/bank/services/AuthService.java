@@ -1,18 +1,24 @@
 package com.voltrex.bank.services;
 
+import com.voltrex.bank.dto.LoginRequest;
 import com.voltrex.bank.dto.RegisterRequest;
 import com.voltrex.bank.entities.Address;
 import com.voltrex.bank.entities.User;
 import com.voltrex.bank.entities.Status;
 import com.voltrex.bank.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     public User register(RegisterRequest request) {
         // Build user entity directly
@@ -35,6 +41,14 @@ public class AuthService {
         user.setStatus(Status.PENDING);
         return userRepository.save(user);
     }
+
+    public String login(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getCrn(),loginRequest.getPassword())
+        );
+        User user = (User)authentication.getPrincipal();
+        return jwtService.generateToken(user);
+    }
 }
 
 
@@ -46,7 +60,7 @@ public class AuthService {
 //import com.voltrex.bank.dto.LoginRequest;
 //import com.voltrex.bank.entities.User;
 //import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 //import org.springframework.security.core.Authentication;
 //import org.springframework.stereotype.Service;
 //
@@ -61,11 +75,5 @@ public class AuthService {
 //        this.jwtService = jwtService;
 //    }
 //
-//    public String login(LoginRequest loginRequest) {
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(loginRequest.getCrn(),loginRequest.getPassword())
-//        );
-//        User user = (User)authentication.getPrincipal();
-//        return jwtService.generateToken(user);
-//    }
+
 //}

@@ -99,6 +99,10 @@ public class UserService implements UserDetailsService{
 
         // TODO: record audit with adminName if needed
     }
+
+    public User getUserById(Long id){
+        return userRepo.findById(id).orElseThrow(null);
+    }
 }
 
 
@@ -155,9 +159,7 @@ public class UserService implements UserDetailsService{
 //                .orElseThrow(null);
 //    }
 //
-//    public User getUserById(Long id){
-//        return userRepo.findById(id).orElseThrow(null);
-//    }
+
 //
 //    public Optional<User> findDomainUserByCrnOrEmail(String principalName) {
 //        return userRepo.findByCrn(principalName).or(() -> userRepo.findByEmail(principalName));

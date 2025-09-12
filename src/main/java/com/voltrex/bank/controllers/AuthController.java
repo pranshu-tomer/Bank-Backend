@@ -1,9 +1,11 @@
 package com.voltrex.bank.controllers;
 
+import com.voltrex.bank.dto.LoginRequest;
 import com.voltrex.bank.dto.RegisterRequest;
 import com.voltrex.bank.entities.Status;
 import com.voltrex.bank.entities.User;
 import com.voltrex.bank.services.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,15 @@ public class AuthController {
     public ResponseEntity<Map<String,Object>> register(@Valid @RequestBody RegisterRequest request) {
         User savedUser = authService.register(request);
         return ResponseEntity.ok(Map.of("success",true));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest){
+        String token = authService.login(loginRequest);
+//        Cookie cookie = new Cookie("token",token);
+//        cookie.setHttpOnly(true);
+//        response.addCookie(cookie);
+        return ResponseEntity.ok(Map.of("success",true,"token",token));
     }
 }
 
@@ -58,13 +69,6 @@ public class AuthController {
 //        this.authService = authService;
 //    }
 //
-//    @PostMapping("/login")
-//    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response){
-//        String token = authService.login(loginRequest);
-//        Cookie cookie = new Cookie("token",token);
-//        cookie.setHttpOnly(true);
-//        response.addCookie(cookie);
-//        return ResponseEntity.ok(Map.of("success",true,"token",token));
-//    }
+
 //}
 //
