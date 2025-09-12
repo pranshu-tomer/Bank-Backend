@@ -3,6 +3,7 @@ package com.voltrex.bank.controllers;
 import com.voltrex.bank.dto.PendingUserDto;
 import com.voltrex.bank.entities.Status;
 import com.voltrex.bank.repositories.UserRepository;
+import com.voltrex.bank.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/pending-users")
     public ResponseEntity<List<PendingUserDto>> getPendingUsers() {
@@ -24,6 +26,12 @@ public class AdminController {
                 .map(u -> new PendingUserDto(u.getId(), u.getFirstName(), u.getEmail(), u.getPhone()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(pending);
+    }
+
+    @PostMapping("/users/{id}/approve")
+    public ResponseEntity<?> approveUser(@PathVariable("id") Long id) {
+        userService.approveUser(id, "admin"); // admin name could come from auth principal
+        return ResponseEntity.ok().build();
     }
 
 }
@@ -48,7 +56,7 @@ public class AdminController {
 //public class AdminController {
 //
 //    private final UserRepository userRepository;
-//    private final UserService userService;
+//
 //
 //    public AdminController(UserRepository userRepository, UserService userService) {
 //        this.userRepository = userRepository;
@@ -61,11 +69,6 @@ public class AdminController {
 //     * Approve a pending user. This will create an Account, generate CRN + temp password,
 //     * mark user as APPROVED and send an email.
 //     */
-//    @PostMapping("/users/{id}/approve")
-//    public ResponseEntity<?> approveUser(@PathVariable("id") Long id) {
-//        userService.approveUser(id, "admin"); // admin name could come from auth principal
-//        return ResponseEntity.ok().build();
-//    }
 //
 //    /**
 //     * Optional: reject user registration. Simple example.

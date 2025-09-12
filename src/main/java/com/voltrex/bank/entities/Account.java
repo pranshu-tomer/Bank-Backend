@@ -48,7 +48,7 @@ public class Account {
 
     @DecimalMin("0.00")
     @Column(nullable = false)
-    private BigDecimal balance = BigDecimal.ZERO;
+    private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -63,7 +63,7 @@ public class Account {
 
     private LocalDateTime closedAt;
 
-    private boolean transactionAlert = false;
+    private boolean transactionAlert;
 
     // Owner
     @ManyToOne(fetch = FetchType.LAZY)
