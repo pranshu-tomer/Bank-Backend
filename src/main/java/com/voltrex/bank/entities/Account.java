@@ -35,7 +35,7 @@ public class Account {
     @Column(unique = true, nullable = false)
     private String accountNumber;
 
-    @DecimalMin("0.00")
+//    @DecimalMin("0.00")
     @Column(nullable = false)
     private BigDecimal balance;
 

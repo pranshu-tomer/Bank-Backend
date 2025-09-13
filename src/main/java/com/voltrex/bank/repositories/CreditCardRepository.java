@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface CreditCardRepository extends JpaRepository<CreditCard, Long> {
     Optional<CreditCard> findByUserId(Long userId);
+    boolean existsByCardNumber(String cardNumber);
 }

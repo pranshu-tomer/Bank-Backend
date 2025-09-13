@@ -2,17 +2,23 @@ package com.voltrex.bank.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record AccountResponse(
-        String accountNumber,
-        String accountType,
-        BigDecimal balance,
-        BigDecimal interestRate,
-        LocalDateTime openedAt,
-        BigDecimal minimumBalance,
-        BigDecimal monthlyFee,
-        BigDecimal monthTotalIn,
-        BigDecimal monthTotalOut,
-        boolean primary
-) {}
+        String number,              // accountNumber or cardNumber
+        String type,                // "SAVINGS", "CURRENT", "SALARY", or "CREDIT_CARD"
+        BigDecimal balance,         // for accounts, null for credit card
+        BigDecimal interestRate,    // for accounts, null for credit card
+        LocalDateTime openedAt,     // for accounts, null for credit card
+        BigDecimal minimumBalance,  // for accounts, null for credit card
+        BigDecimal monthlyFee,      // for accounts, null for credit card
+        BigDecimal monthIn,         // for accounts, null for credit card
+        BigDecimal monthOut,        // for accounts, null for credit card
+        Boolean primaryAccount,     // for accounts, null for credit card
 
+        // --- credit card specific ---
+        BigDecimal creditLimit,     // only for credit card
+        BigDecimal creditUsed,      // only for credit card
+        LocalDate expiryDate,       // only for credit card
+        LocalDateTime issuedAt          // only for credit card
+) {}

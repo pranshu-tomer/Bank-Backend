@@ -8,6 +8,6 @@ import lombok.Data;
 public class CreateAccountRequest {
 
     @NotNull
-    private AccountType type; // SAVINGS, SALARY, CURRENT
+    private String type; // SAVINGS, SALARY, CURRENT
 }
 
