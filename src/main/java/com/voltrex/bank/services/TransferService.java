@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +35,8 @@ public class TransferService {
     private final TransactionRepository txnRepo;
     private final UserRepository userRepo;
     private final ReferenceGenerator refGen; // your bean (UUID-based)
+
+    private static final Logger log = LoggerFactory.getLogger(TransferService.class);
 
     /**
      * Transfer using receiver's account number + name verification.
@@ -122,11 +127,11 @@ public class TransferService {
         BigDecimal amount = req.getAmount();
 
         // find receiver user by CRN or email
-        Optional<com.voltrex.bank.entities.User> maybe = userRepo.findByCrn(req.getReceiverIdentifier());
+        Optional<User> maybe = userRepo.findByCrn(req.getReceiverIdentifier());
         if (maybe.isEmpty()) maybe = userRepo.findByEmail(req.getReceiverIdentifier());
         if (maybe.isEmpty()) throw new NotFoundException("Receiver not found");
 
-        com.voltrex.bank.entities.User receiver = maybe.get();
+        User receiver = maybe.get();
 
         if (!matchesName(receiver, req.getReceiverName())) {
             throw new TransferException("Receiver details are incorrect");
@@ -184,16 +189,24 @@ public class TransferService {
         accountRepo.save(fromAccount);
         accountRepo.save(toAccount);
 
+        // after you have debited/credited the accounts and saved accountRepo.save(...)
         Transaction tx = Transaction.builder()
                 .referenceNumber(refGen.generate())
                 .amount(amount)
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)
                 .description(req.getDescription())
-                .type(req.getType())
                 .status("COMPLETED")
+                .type(req.getType()) // ensure your DTO supplies type
+                // set snapshots:
                 .build();
 
+        log.info("Before saving tx: fromBalanceAfter={}, toBalanceAfter={}", fromAccount.getBalance(), toAccount.getBalance());
+        log.info("Setting tx.fromAccountBalanceAfter={}, tx.toAccountBalanceAfter={}", fromAccount.getBalance(), toAccount.getBalance());
+        txnRepo.save(tx);
+
+        tx.setFromAccountBalanceAfter(fromAccount.getBalance());
+        tx.setToAccountBalanceAfter(toAccount.getBalance());
         txnRepo.save(tx);
 
         return tx.getReferenceNumber();

@@ -64,6 +64,12 @@ public class Transaction {
 
     private String description;
 
+    @Column(precision = 19, scale = 2)
+    private BigDecimal fromAccountBalanceAfter;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal toAccountBalanceAfter;
+
     /**
      * Example: bank charge or external status; if you want a strict status enum add it.
      */
