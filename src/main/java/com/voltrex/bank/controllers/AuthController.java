@@ -1,6 +1,7 @@
 package com.voltrex.bank.controllers;
 
 import com.voltrex.bank.dto.LoginRequest;
+import com.voltrex.bank.dto.PasswordChangeRequest;
 import com.voltrex.bank.dto.RegisterRequest;
 import com.voltrex.bank.entities.Status;
 import com.voltrex.bank.entities.User;

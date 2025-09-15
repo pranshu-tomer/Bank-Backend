@@ -36,6 +36,7 @@ public class AuthService {
                 .dob(request.getDob())
                 .age(request.getAge())
                 .gender(request.getGender())
+                .twoFactorEnabled(false)
                 .build();
 
         user.setStatus(Status.PENDING);

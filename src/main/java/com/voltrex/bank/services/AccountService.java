@@ -58,6 +58,7 @@ public class AccountService {
                     monthIn,
                     monthOut,
                     acc.isPrimaryAccount(),
+                    acc.isTransactionAlert(),
                     null, // creditLimit
                     null, // creditUsed
                     null, // expiryDate
@@ -78,6 +79,7 @@ public class AccountService {
                     null,                // monthIn not applicable
                     null,                // monthOut not applicable
                     null,                // primaryAccount not applicable
+                    false,
                     card.getCreditLimit(),
                     card.getCreditUsed(),
                     card.getExpiryDate(),

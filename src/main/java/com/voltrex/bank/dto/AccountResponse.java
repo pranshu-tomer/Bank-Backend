@@ -15,6 +15,7 @@ public record AccountResponse(
         BigDecimal monthIn,         // for accounts, null for credit card
         BigDecimal monthOut,        // for accounts, null for credit card
         Boolean primaryAccount,     // for accounts, null for credit card
+        Boolean transactionAlert,
 
         // --- credit card specific ---
         BigDecimal creditLimit,     // only for credit card

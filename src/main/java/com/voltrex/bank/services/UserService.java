@@ -1,5 +1,6 @@
 package com.voltrex.bank.services;
 
+import com.voltrex.bank.dto.UserResponse;
 import com.voltrex.bank.entities.Account;
 import com.voltrex.bank.entities.AccountType;
 import com.voltrex.bank.entities.Status;
