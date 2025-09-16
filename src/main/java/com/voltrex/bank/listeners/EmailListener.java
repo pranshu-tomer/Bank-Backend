@@ -1,23 +1,28 @@
-package com.voltrex.bank.services;
+package com.voltrex.bank.listeners;
 
+import com.voltrex.bank.events.UserApprovedEvent;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-public class EmailService {
+@Component
+@RequiredArgsConstructor
+public class EmailListener {
+
     private final JavaMailSender mailSender;
-    public EmailService(JavaMailSender mailSender) { this.mailSender = mailSender; }
 
-    public void sendAccountApprovedEmail(String to, String name, String crn, String tempPassword, String accountNumber) {
+    @EventListener
+    public void handleApprovedUser(UserApprovedEvent userEvent){
         String subject = "Your banking account is ready";
         String text = String.format(
                 "Hi %s,\n\nYour account has been approved.\nCRN: %s\nAccount Number: %s\nTemporary Password: %s\n\nPlease login and change your password immediately.\n\nRegards,\nBanking Team",
-                name, crn, accountNumber, tempPassword
+                userEvent.getName(), userEvent.getCrn(), userEvent.getAccNumber(), userEvent.getTempPassword()
         );
 
         SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(to);
+        msg.setTo(userEvent.getEmail());
         msg.setSubject(subject);
         msg.setText(text);
         mailSender.send(msg);

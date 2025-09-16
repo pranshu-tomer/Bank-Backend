@@ -69,4 +69,18 @@ public class AccountController {
         List<ProductResponse> resp = productService.getAvailableProductsForUser(current.getId());
         return ResponseEntity.ok(Map.of("success",true,"data",resp));
     }
+
+    @PostMapping("/change/txn/alert")
+    public ResponseEntity<Map<String,Object>> changeTransactionAlert(
+            @RequestParam("accNumber") String accNumber,
+            @RequestParam("value") Boolean value
+    ){
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = currentUser.getId();
+        if (userId == null) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "error", "Unauthorized"));
+        }
+
+        return accountService.changeTransactionAlert(accNumber,value,currentUser);
+    }
 }

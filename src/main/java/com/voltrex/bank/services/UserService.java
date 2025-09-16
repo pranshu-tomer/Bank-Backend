@@ -4,6 +4,7 @@ import com.voltrex.bank.dto.UserDataRequest;
 import com.voltrex.bank.dto.UserResponse;
 import com.voltrex.bank.dto.UserSecurityRequest;
 import com.voltrex.bank.entities.*;
+import com.voltrex.bank.events.UserApprovedEvent;
 import com.voltrex.bank.exception.EmailAlreadyExistsException;
 import com.voltrex.bank.exception.PhoneAlreadyExistsException;
 import com.voltrex.bank.repositories.AccountRepository;
@@ -12,6 +13,7 @@ import com.voltrex.bank.utils.AccountNumberGenerator;
 import com.voltrex.bank.utils.CRNGenerator;
 import com.voltrex.bank.utils.PasswordGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,7 +35,7 @@ public class UserService implements UserDetailsService{
     private final CRNGenerator crnGen;
     private final PasswordGenerator passGen;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -91,14 +93,13 @@ public class UserService implements UserDetailsService{
 
         userRepo.save(user);
 
-        // --- Send email ---
-        emailService.sendAccountApprovedEmail(
-                user.getEmail(),
+
+        publisher.publishEvent(new UserApprovedEvent(user.getEmail(),
                 user.getFirstName() + " " + user.getLastName(),
                 crn,
                 tempPassword,
                 accNumber
-        );
+        ));
 
         // TODO: record audit with adminName if needed
     }

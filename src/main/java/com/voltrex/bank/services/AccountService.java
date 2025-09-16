@@ -5,12 +5,14 @@ import com.voltrex.bank.dto.CreateAccountRequest;
 import com.voltrex.bank.entities.Account;
 import com.voltrex.bank.entities.AccountType;
 import com.voltrex.bank.entities.User;
+import com.voltrex.bank.exception.NotFoundException;
 import com.voltrex.bank.repositories.AccountRepository;
 import com.voltrex.bank.repositories.TransactionRepository;
 import com.voltrex.bank.repositories.UserRepository;
 import com.voltrex.bank.utils.AccountNumberGenerator;
 import com.voltrex.bank.utils.CardNumberGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,8 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -111,5 +115,16 @@ public class AccountService {
         return accNumber;
     }
 
+    public ResponseEntity<Map<String, Object>> changeTransactionAlert(String accNumber, Boolean value,User user) {
+        Account currAccount = accountRepo.findByAccountNumber(accNumber).orElseThrow(() -> new NotFoundException("Account not found"));
+        User owner = currAccount.getOwner();
+        if(owner == null || !Objects.equals(owner.getId(), user.getId())){
+            return ResponseEntity.status(401).body(Map.of("success", false, "error", "Account Not Belong to user"));
+        }
+
+        currAccount.setTransactionAlert(value);
+        accountRepo.save(currAccount);
+        return ResponseEntity.ok(Map.of("success",true));
+    }
 }
 
