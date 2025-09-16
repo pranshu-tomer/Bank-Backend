@@ -5,10 +5,12 @@ import com.voltrex.bank.dto.RegisterRequest;
 import com.voltrex.bank.entities.Address;
 import com.voltrex.bank.entities.User;
 import com.voltrex.bank.entities.Status;
+import com.voltrex.bank.events.UserLoginEvent;
 import com.voltrex.bank.exception.EmailAlreadyExistsException;
 import com.voltrex.bank.exception.PhoneAlreadyExistsException;
 import com.voltrex.bank.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +28,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final ApplicationEventPublisher publisher;
 
     public User register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -65,6 +68,10 @@ public class AuthService {
 
             User user = (User) authentication.getPrincipal();
             String token = jwtService.generateToken(user);
+
+            if(user.isLoginAlert()){
+                publisher.publishEvent(new UserLoginEvent(user.getEmail(),user.getFirstName() + " " + user.getLastName()));
+            }
 
             return ResponseEntity.ok(Map.of("success", true, "token", token));
         } catch (AuthenticationException ex) {

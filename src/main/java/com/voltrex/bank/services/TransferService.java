@@ -5,6 +5,7 @@ import com.voltrex.bank.dto.TransferByReceiverRequest;
 import com.voltrex.bank.entities.Account;
 import com.voltrex.bank.entities.Transaction;
 import com.voltrex.bank.entities.User;
+import com.voltrex.bank.events.TransactionEvent;
 import com.voltrex.bank.exception.InsufficientFundsException;
 import com.voltrex.bank.exception.LimitExceededException;
 import com.voltrex.bank.exception.NotFoundException;
@@ -15,6 +16,7 @@ import com.voltrex.bank.repositories.TransactionRepository;
 import com.voltrex.bank.repositories.UserRepository;
 import com.voltrex.bank.utils.ReferenceGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class TransferService {
     private final TransactionRepository txnRepo;
     private final UserRepository userRepo;
     private final ReferenceGenerator refGen; // your bean (UUID-based)
+    private final ApplicationEventPublisher publisher;
 
     private static final Logger log = LoggerFactory.getLogger(TransferService.class);
 
@@ -103,6 +106,36 @@ public class TransferService {
         // persist accounts & transaction
         accountRepo.save(fromAccount);
         accountRepo.save(toAccount);
+
+        if(fromAccount.isTransactionAlert()){
+            User fromUser = fromAccount.getOwner();
+            String email = fromUser.getEmail();
+            String name = fromUser.getFirstName() + " " + fromUser.getLastName();
+            publisher.publishEvent(new TransactionEvent(
+                    email,
+                    name,
+                    "debit",
+                    fromAccount.getType(),
+                    fromAccount.getAccountNumber(),
+                    req.getAmount(),
+                    fromAccount.getBalance()
+            ));
+        }
+
+        if(toAccount.isTransactionAlert()){
+            User toUser = toAccount.getOwner();
+            String email = toUser.getEmail();
+            String name = toUser.getFirstName() + " " + toUser.getLastName();
+            publisher.publishEvent(new TransactionEvent(
+                    email,
+                    name,
+                    "credit",
+                    toAccount.getType(),
+                    toAccount.getAccountNumber(),
+                    req.getAmount(),
+                    toAccount.getBalance()
+            ));
+        }
 
         Transaction tx = Transaction.builder()
                 .referenceNumber(refGen.generate())
@@ -188,6 +221,36 @@ public class TransferService {
 
         accountRepo.save(fromAccount);
         accountRepo.save(toAccount);
+
+        if(fromAccount.isTransactionAlert()){
+            User fromUser = fromAccount.getOwner();
+            String email = fromUser.getEmail();
+            String name = fromUser.getFirstName() + " " + fromUser.getLastName();
+            publisher.publishEvent(new TransactionEvent(
+                    email,
+                    name,
+                    "debit",
+                    fromAccount.getType(),
+                    fromAccount.getAccountNumber(),
+                    req.getAmount(),
+                    fromAccount.getBalance()
+            ));
+        }
+
+        if(toAccount.isTransactionAlert()){
+            User toUser = toAccount.getOwner();
+            String email = toUser.getEmail();
+            String name = toUser.getFirstName() + " " + toUser.getLastName();
+            publisher.publishEvent(new TransactionEvent(
+                    email,
+                    name,
+                    "credit",
+                    toAccount.getType(),
+                    toAccount.getAccountNumber(),
+                    req.getAmount(),
+                    toAccount.getBalance()
+            ));
+        }
 
         // after you have debited/credited the accounts and saved accountRepo.save(...)
         Transaction tx = Transaction.builder()
