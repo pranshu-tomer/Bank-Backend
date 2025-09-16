@@ -55,21 +55,7 @@ public class UserController {
             return ResponseEntity.status(401).body(Map.of("success", false, "error", "Unauthorized"));
         }
 
-        currentUser.setFirstName(req.getFirstName());
-        currentUser.setLastName(req.getLastName());
-        currentUser.setEmail(req.getEmail());
-        currentUser.setPhone(req.getPhone());
-
-        Address address = new Address();
-        address.setState(req.getState());
-        address.setStreet(req.getStreet());
-        address.setCity(req.getCity());
-        address.setPincode(req.getPincode());
-
-        currentUser.setAddress(address);
-
-        userRepo.save(currentUser);
-        return ResponseEntity.ok(Map.of("success", true));
+        return userService.updateUser(req,currentUser);
     }
 
     @PostMapping("/security/save")

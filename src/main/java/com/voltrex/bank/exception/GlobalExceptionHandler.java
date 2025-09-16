@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
-                "errors", errors
+                "error", errors
         ));
     }
 
@@ -52,6 +52,20 @@ public class GlobalExceptionHandler {
         // log error server-side in real app (omitted here)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("success", false, "error", "Internal server error"));
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleEmailExists(EmailAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT) // 409 is good for duplicates
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(PhoneAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handlePhoneExists(PhoneAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT) // 409 is good for duplicates
+                .body(Map.of("error", ex.getMessage()));
     }
 }
 

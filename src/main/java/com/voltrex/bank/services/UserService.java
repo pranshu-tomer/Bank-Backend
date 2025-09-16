@@ -1,16 +1,18 @@
 package com.voltrex.bank.services;
 
+import com.voltrex.bank.dto.UserDataRequest;
 import com.voltrex.bank.dto.UserResponse;
-import com.voltrex.bank.entities.Account;
-import com.voltrex.bank.entities.AccountType;
-import com.voltrex.bank.entities.Status;
-import com.voltrex.bank.entities.User;
+import com.voltrex.bank.dto.UserSecurityRequest;
+import com.voltrex.bank.entities.*;
+import com.voltrex.bank.exception.EmailAlreadyExistsException;
+import com.voltrex.bank.exception.PhoneAlreadyExistsException;
 import com.voltrex.bank.repositories.AccountRepository;
 import com.voltrex.bank.repositories.UserRepository;
 import com.voltrex.bank.utils.AccountNumberGenerator;
 import com.voltrex.bank.utils.CRNGenerator;
 import com.voltrex.bank.utils.PasswordGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +88,6 @@ public class UserService implements UserDetailsService{
         user.setPassword(hash);
         user.setStatus(Status.APPROVED);
         user.getAccounts().add(savingsAccount);
-        user.setCreditCard(null); // enforce no card initially
 
         userRepo.save(user);
 
@@ -104,72 +106,29 @@ public class UserService implements UserDetailsService{
     public User getUserById(Long id){
         return userRepo.findById(id).orElseThrow(null);
     }
+
+    public ResponseEntity<Map<String,Object>> updateUser(UserDataRequest req, User currentUser){
+        if (!currentUser.getEmail().equals(req.getEmail()) && userRepo.existsByEmail(req.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+        if (!currentUser.getPhone().equals(req.getPhone()) && userRepo.existsByPhone(req.getPhone())) {
+            throw new PhoneAlreadyExistsException("Phone Number already exists");
+        }
+
+        currentUser.setFirstName(req.getFirstName());
+        currentUser.setLastName(req.getLastName());
+        currentUser.setEmail(req.getEmail());
+        currentUser.setPhone(req.getPhone());
+
+        Address address = new Address();
+        address.setState(req.getState());
+        address.setStreet(req.getStreet());
+        address.setCity(req.getCity());
+        address.setPincode(req.getPincode());
+
+        currentUser.setAddress(address);
+
+        userRepo.save(currentUser);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
 }
-
-
-//public class UserService implements UserDetailsService {
-//    private final UserRepository userRepo;
-//
-//
-//
-//
-//
-//
-//
-//    public UserService(UserRepository userRepo,
-//                       AccountRepository accountRepo,
-//                       AccountNumberGenerator accGen,
-//                       CRNGenerator crnGen,
-//                       PasswordGenerator passGen,
-//                       EmailService emailService, PasswordEncoder passwordEncoder) {
-//        this.userRepo = userRepo;
-//        this.accountRepo = accountRepo;
-//        this.accGen = accGen;
-//        this.crnGen = crnGen;
-//        this.passGen = passGen;
-//        this.emailService = emailService;
-//        this.passwordEncoder = passwordEncoder;
-//    }
-//
-//    public User registerUser(String name, String email, String phone, String address,
-//                             String gender, Integer age,String dob) {
-//        // basic checks
-//        userRepo.findByEmail(email).ifPresent(u -> {
-//            throw new IllegalArgumentException("Email already in use");
-//        });
-//        User u = new User();
-//        u.setName(name);
-//        u.setEmail(email);
-//        u.setPhone(phone);
-//        u.setAddress(address);
-//        u.setGender(gender);
-//        u.setAge(age);
-//        u.setDob(dob);
-//        u.setStatus(RegistrationStatus.PENDING);
-//        userRepo.save(u);
-//
-//        // Optionally publish event or push notification to admin here.
-//        return u;
-//    }
-//
-
-//
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        return userRepo.findByCrn(username)
-//                .orElseThrow(null);
-//    }
-//
-
-//
-//    public Optional<User> findDomainUserByCrnOrEmail(String principalName) {
-//        return userRepo.findByCrn(principalName).or(() -> userRepo.findByEmail(principalName));
-//    }
-//
-//    public String getUserNameById(Long userId) {
-//        User user = userRepo.findById(userId).orElseThrow(null);
-//        return user.getName();
-//    }
-//}
-//
-//

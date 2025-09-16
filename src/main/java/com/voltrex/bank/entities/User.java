@@ -95,12 +95,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Account> accounts = new ArrayList<>();
 
-    /**
-     * Optional one-to-one credit card (sketch: max 1 credit card per user). Mapped on CreditCard side.
-     */
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private CreditCard creditCard;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

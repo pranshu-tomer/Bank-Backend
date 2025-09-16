@@ -15,11 +15,5 @@ public record AccountResponse(
         BigDecimal monthIn,         // for accounts, null for credit card
         BigDecimal monthOut,        // for accounts, null for credit card
         Boolean primaryAccount,     // for accounts, null for credit card
-        Boolean transactionAlert,
-
-        // --- credit card specific ---
-        BigDecimal creditLimit,     // only for credit card
-        BigDecimal creditUsed,      // only for credit card
-        LocalDate expiryDate,       // only for credit card
-        LocalDateTime issuedAt          // only for credit card
+        Boolean transactionAlert
 ) {}

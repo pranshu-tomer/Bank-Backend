@@ -5,12 +5,19 @@ import com.voltrex.bank.dto.RegisterRequest;
 import com.voltrex.bank.entities.Address;
 import com.voltrex.bank.entities.User;
 import com.voltrex.bank.entities.Status;
+import com.voltrex.bank.exception.EmailAlreadyExistsException;
+import com.voltrex.bank.exception.PhoneAlreadyExistsException;
 import com.voltrex.bank.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +28,13 @@ public class AuthService {
     private final JwtService jwtService;
 
     public User register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new PhoneAlreadyExistsException("Phone Number already exists");
+        }
+
         // Build user entity directly
         User user = User.builder()
                 .firstName(request.getFirstName())
@@ -43,12 +57,20 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public String login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getCrn(),loginRequest.getPassword())
-        );
-        User user = (User)authentication.getPrincipal();
-        return jwtService.generateToken(user);
+    public ResponseEntity<Map<String,Object>> login(LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getCrn(), loginRequest.getPassword())
+            );
+
+            User user = (User) authentication.getPrincipal();
+            String token = jwtService.generateToken(user);
+
+            return ResponseEntity.ok(Map.of("success", true, "token", token));
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("success", false, "error", "Invalid credentials"));
+        }
     }
 }
 

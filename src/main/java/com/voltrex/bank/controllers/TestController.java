@@ -25,7 +25,7 @@ public class TestController {
 
         BigDecimal current = account.getBalance();
         if (current == null) current = BigDecimal.ZERO;
-        BigDecimal added = BigDecimal.valueOf(500);
+        BigDecimal added = BigDecimal.valueOf(10000);
         BigDecimal updated = current.add(added);
         account.setBalance(updated);
         accountRepository.save(account);

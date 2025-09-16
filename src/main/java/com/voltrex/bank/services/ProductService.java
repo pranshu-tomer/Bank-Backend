@@ -4,7 +4,6 @@ import com.voltrex.bank.dto.ProductResponse;
 import com.voltrex.bank.entities.Account;
 import com.voltrex.bank.entities.User;
 import com.voltrex.bank.entities.AccountType;
-import com.voltrex.bank.repositories.CreditCardRepository;
 import com.voltrex.bank.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final UserRepository userRepo;
-    private final CreditCardRepository creditCardRepo;
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getAvailableProductsForUser(Long userId) {
@@ -41,12 +39,6 @@ public class ProductService {
                 .map(this::toProductDto)
                 .forEach(available::add);
 
-        // add credit card if user doesn't already have one
-        boolean hasCard = creditCardRepo.findByUserId(userId).isPresent();
-        if (!hasCard) {
-            available.add(creditCardProduct());
-        }
-
         return available;
     }
 
@@ -59,22 +51,7 @@ public class ProductService {
                 t.getMinimumBalance(),
                 t.getMinimumBalancePenalty(),
                 t.getMaxDailyWithdrawal(),
-                t.getMaxDailyDeposit(),
-                null // no creditLimit for normal accounts
-        );
-    }
-
-    private ProductResponse creditCardProduct() {
-        return new ProductResponse(
-                "CREDIT_CARD",
-                BigDecimal.ZERO, // opening charge
-                BigDecimal.ZERO, // interestRate (handled separately for credit card)
-                BigDecimal.ZERO, // monthlyFee
-                BigDecimal.ZERO, // minBalance
-                BigDecimal.ZERO, // minBalancePenalty
-                BigDecimal.ZERO, // maxDailyWithdrawal (not applicable)
-                BigDecimal.ZERO, // maxDailyDeposit (not applicable)
-                new BigDecimal("50000.00") // default credit limit
+                t.getMaxDailyDeposit()
         );
     }
 }

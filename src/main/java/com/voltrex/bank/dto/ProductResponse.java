@@ -20,8 +20,5 @@ public class ProductResponse {
     private BigDecimal minimumBalancePenalty;
     private BigDecimal maxDailyWithdrawal;
     private BigDecimal maxDailyDeposit;
-
-    // Only relevant for credit card
-    private BigDecimal creditLimit;
 }
 
