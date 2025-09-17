@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -29,9 +30,9 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/approve")
-    public ResponseEntity<?> approveUser(@PathVariable("id") Long id) {
+    public ResponseEntity<Map<String,Object>> approveUser(@PathVariable("id") Long id) {
         userService.approveUser(id, "admin"); // admin name could come from auth principal
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of("success",true));
     }
 
 }

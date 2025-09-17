@@ -1,18 +1,14 @@
 package com.voltrex.bank.controllers;
 
 import com.voltrex.bank.dto.LoginRequest;
-import com.voltrex.bank.dto.PasswordChangeRequest;
 import com.voltrex.bank.dto.RegisterRequest;
-import com.voltrex.bank.entities.Status;
 import com.voltrex.bank.entities.User;
 import com.voltrex.bank.services.AuthService;
 import com.voltrex.bank.services.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -23,7 +19,6 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<Map<String,Object>> register(@Valid @RequestBody RegisterRequest request) {
