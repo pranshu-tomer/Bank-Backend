@@ -114,6 +114,10 @@ Top-level domain entities (package `com.voltrex.bank.entities`):
 
 ---
 
+## ERD (Entity Relationship Diagram)
+
+---
+
 ## Getting started (local)
 
 ### Prerequisites
