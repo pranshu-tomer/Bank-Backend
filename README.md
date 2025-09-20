@@ -116,6 +116,10 @@ Top-level domain entities (package `com.voltrex.bank.entities`):
 
 ## ERD (Entity Relationship Diagram)
 
+This diagram shows the **core entities (User, Account, Transaction, etc.)** and their relationships.
+
+![Data Model](./dataModel.png)
+
 ---
 
 ## Getting started (local)
