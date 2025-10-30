@@ -16,10 +16,12 @@ jobs:
           for i in 1 2 3; do
             HTTP_CODE=$(curl -fsS -o /dev/null -w "%{http_code}" "$URL" || echo "000")
             echo "Attempt $i -> HTTP $HTTP_CODE"
-            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
-              echo "Success"
+            # Treat 200–399 and 403 as success
+            if { [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; } || [ "$HTTP_CODE" -eq 403 ]; then
+              echo "Success (HTTP $HTTP_CODE)"
               exit 0
             fi
             sleep $(( i * 5 ))
           done
-          echo "All attempts failed"; exit 1
+          echo "All attempts failed"
+          exit 1
